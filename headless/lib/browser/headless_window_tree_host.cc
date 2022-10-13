@@ -95,6 +95,12 @@ HeadlessWindowTreeHost::GetKeyboardLayoutMap() {
   return {};
 }
 
+ui::DomKeyboardLayoutName
+HeadlessWindowTreeHost::GetKeyboardLayoutIdentifier() {
+  NOTIMPLEMENTED();
+  return {};
+}
+
 void HeadlessWindowTreeHost::SetCursorNative(gfx::NativeCursor cursor_type) {}
 
 void HeadlessWindowTreeHost::MoveCursorToScreenLocationInPixels(

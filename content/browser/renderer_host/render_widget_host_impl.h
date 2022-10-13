@@ -68,6 +68,7 @@
 #include "ui/base/ime/text_input_mode.h"
 #include "ui/base/ime/text_input_type.h"
 #include "ui/base/ui_base_types.h"
+#include "ui/events/keycodes/dom/dom_keyboard_layout_name.h"
 #include "ui/gfx/native_widget_types.h"
 #include "ui/latency/latency_info.h"
 
@@ -814,6 +815,9 @@ class CONTENT_EXPORT RenderWidgetHostImpl
 
   // Returns the keyboard layout mapping.
   base::flat_map<std::string, std::string> GetKeyboardLayoutMap();
+
+  // Returns the keyboard layout name.
+  ui::DomKeyboardLayoutName GetKeyboardLayoutIdentifier();
 
   void RequestForceRedraw(int snapshot_id);
 

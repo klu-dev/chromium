@@ -8,6 +8,7 @@
 #include <string>
 
 #include "base/containers/flat_map.h"
+#include "ui/events/keycodes/dom/dom_keyboard_layout_name.h"
 
 namespace ui {
 
@@ -17,6 +18,7 @@ namespace ui {
 // layout or the first ASCII capable layout available.
 // More info at: https://wicg.github.io/keyboard-map/
 base::flat_map<std::string, std::string> GenerateDomKeyboardLayoutMap();
+ui::DomKeyboardLayoutName GetDomKeyboardLayoutName();
 
 }  // namespace ui
 

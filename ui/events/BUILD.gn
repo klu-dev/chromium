@@ -41,6 +41,7 @@ static_library("dom_keyboard_layout") {
   public = [
     "keycodes/dom/dom_keyboard_layout.h",
     "keycodes/dom/dom_keyboard_layout_manager.h",
+    "keycodes/dom/dom_keyboard_layout_name.h",
   ]
 
   sources = [

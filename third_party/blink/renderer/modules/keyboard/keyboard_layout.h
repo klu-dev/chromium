@@ -28,6 +28,7 @@ class KeyboardLayout final : public GarbageCollected<KeyboardLayout>,
   virtual ~KeyboardLayout() = default;
 
   ScriptPromise GetKeyboardLayoutMap(ScriptState*, ExceptionState&);
+  ScriptPromise GetKeyboardLayoutName(ScriptState*, ExceptionState&);
 
   void Trace(Visitor*) const override;
 
@@ -40,6 +41,9 @@ class KeyboardLayout final : public GarbageCollected<KeyboardLayout>,
 
   void GotKeyboardLayoutMap(ScriptPromiseResolver*,
                             mojom::blink::GetKeyboardLayoutMapResultPtr);
+
+  void GotKeyboardLayoutName(ScriptPromiseResolver*,
+                            mojom::blink::GetKeyboardLayoutNameResultPtr);
 
   Member<ScriptPromiseResolver> script_promise_resolver_;
 

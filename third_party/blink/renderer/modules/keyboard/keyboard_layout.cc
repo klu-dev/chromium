@@ -9,14 +9,17 @@
 #include "third_party/blink/public/common/privacy_budget/identifiability_study_settings.h"
 #include "third_party/blink/public/common/privacy_budget/identifiable_surface.h"
 #include "third_party/blink/public/common/privacy_budget/identifiable_token_builder.h"
+#include "third_party/blink/public/mojom/keyboard_lock/keyboard_lock.mojom-blink.h"
 #include "third_party/blink/public/platform/platform.h"
 #include "third_party/blink/public/platform/task_type.h"
 #include "third_party/blink/renderer/bindings/core/v8/script_promise_resolver.h"
 #include "third_party/blink/renderer/bindings/core/v8/v8_throw_dom_exception.h"
+#include "third_party/blink/renderer/bindings/modules/v8/v8_keyboard_layout_name.h"
 #include "third_party/blink/renderer/core/dom/dom_exception.h"
 #include "third_party/blink/renderer/core/execution_context/execution_context.h"
 #include "third_party/blink/renderer/core/frame/local_dom_window.h"
 #include "third_party/blink/renderer/core/frame/local_frame.h"
+#include "third_party/blink/renderer/modules/keyboard/keyboard_type_converters.h"
 #include "third_party/blink/renderer/platform/bindings/exception_state.h"
 #include "third_party/blink/renderer/platform/heap/garbage_collected.h"
 #include "third_party/blink/renderer/platform/privacy_budget/identifiability_digest_helpers.h"
@@ -36,10 +39,18 @@ constexpr char kFeaturePolicyBlocked[] =
 constexpr char kKeyboardMapRequestFailedErrorMsg[] =
     "getLayoutMap() request could not be completed.";
 
+constexpr char kKeyboardNameRequestFailedErrorMsg[] =
+    "getLayoutName() request could not be completed.";
+
 constexpr IdentifiableSurface kGetKeyboardLayoutMapSurface =
     IdentifiableSurface::FromTypeAndToken(
         IdentifiableSurface::Type::kWebFeature,
         WebFeature::kKeyboardApiGetLayoutMap);
+
+constexpr IdentifiableSurface kGetKeyboardLayoutNameSurface =
+    IdentifiableSurface::FromTypeAndToken(
+        IdentifiableSurface::Type::kWebFeature,
+        WebFeature::kKeyboardApiGetLayoutName);
 
 IdentifiableToken ComputeLayoutValue(
     const WTF::HashMap<WTF::String, WTF::String>& layout_map) {
@@ -58,6 +69,24 @@ void RecordGetLayoutMapResult(ExecutionContext* context,
 
   IdentifiabilityMetricBuilder(context->UkmSourceID())
       .Add(kGetKeyboardLayoutMapSurface, value)
+      .Record(context->UkmRecorder());
+}
+
+IdentifiableToken ComputeLayoutNameValue(
+    const blink::mojom::blink::KeyboardLayoutNamePtr& layout_name) {
+  IdentifiableTokenBuilder builder;
+  builder.AddToken(IdentifiabilityBenignStringToken(layout_name->locale));
+  builder.AddToken(IdentifiabilityBenignStringToken(layout_name->layout));
+  return builder.GetToken();
+}
+
+void RecordGetLayoutNameResult(ExecutionContext* context,
+                               IdentifiableToken value) {
+  if (!context)
+    return;
+
+  IdentifiabilityMetricBuilder(context->UkmSourceID())
+      .Add(kGetKeyboardLayoutNameSurface, value)
       .Record(context->UkmRecorder());
 }
 
@@ -98,6 +127,41 @@ ScriptPromise KeyboardLayout::GetKeyboardLayoutMap(
   service_->GetKeyboardLayoutMap(
       script_promise_resolver_->WrapCallbackInScriptScope(WTF::BindOnce(
           &KeyboardLayout::GotKeyboardLayoutMap, WrapPersistent(this))));
+  return script_promise_resolver_->Promise();
+}
+
+ScriptPromise KeyboardLayout::GetKeyboardLayoutName(
+    ScriptState* script_state,
+    ExceptionState& exception_state) {
+  DCHECK(script_state);
+
+  if (script_promise_resolver_) {
+    return script_promise_resolver_->Promise();
+  }
+
+  if (!IsLocalFrameAttached()) {
+    exception_state.ThrowDOMException(DOMExceptionCode::kInvalidStateError,
+                                      kKeyboardMapFrameDetachedErrorMsg);
+    return ScriptPromise();
+  }
+
+  if (!EnsureServiceConnected()) {
+    if (IdentifiabilityStudySettings::Get()->ShouldSampleSurface(
+            kGetKeyboardLayoutNameSurface)) {
+      RecordGetLayoutNameResult(ExecutionContext::From(script_state),
+                                IdentifiableToken());
+    }
+
+    exception_state.ThrowDOMException(DOMExceptionCode::kInvalidStateError,
+                                      kKeyboardNameRequestFailedErrorMsg);
+    return ScriptPromise();
+  }
+
+  script_promise_resolver_ =
+      MakeGarbageCollected<ScriptPromiseResolver>(script_state);
+  service_->GetKeyboardLayoutName(
+      script_promise_resolver_->WrapCallbackInScriptScope(WTF::BindOnce(
+          &KeyboardLayout::GotKeyboardLayoutName, WrapPersistent(this))));
   return script_promise_resolver_->Promise();
 }
 
@@ -145,6 +209,43 @@ void KeyboardLayout::GotKeyboardLayoutMap(
           kKeyboardMapRequestFailedErrorMsg));
       break;
     case mojom::blink::GetKeyboardLayoutMapStatus::kDenied:
+      resolver->Reject(V8ThrowDOMException::CreateOrDie(
+          resolver->GetScriptState()->GetIsolate(),
+          DOMExceptionCode::kSecurityError, kFeaturePolicyBlocked));
+      break;
+  }
+
+  script_promise_resolver_ = nullptr;
+}
+
+void KeyboardLayout::GotKeyboardLayoutName(
+    ScriptPromiseResolver* resolver,
+    mojom::blink::GetKeyboardLayoutNameResultPtr result) {
+  DCHECK(script_promise_resolver_);
+
+  bool instrumentation_on =
+      IdentifiabilityStudySettings::Get()->ShouldSampleSurface(
+          kGetKeyboardLayoutNameSurface);
+
+  switch (result->status) {
+    case mojom::blink::GetKeyboardLayoutNameStatus::kSuccess:
+      if (instrumentation_on) {
+        RecordGetLayoutNameResult(GetExecutionContext(),
+                                  ComputeLayoutNameValue(result->layout_name));
+      }
+      resolver->Resolve(
+          mojo::ConvertTo<KeyboardLayoutName*>(result->layout_name));
+      break;
+    case mojom::blink::GetKeyboardLayoutNameStatus::kFail:
+      if (instrumentation_on)
+        RecordGetLayoutNameResult(GetExecutionContext(), IdentifiableToken());
+
+      resolver->Reject(V8ThrowDOMException::CreateOrDie(
+          resolver->GetScriptState()->GetIsolate(),
+          DOMExceptionCode::kInvalidStateError,
+          kKeyboardNameRequestFailedErrorMsg));
+      break;
+    case mojom::blink::GetKeyboardLayoutNameStatus::kDenied:
       resolver->Reject(V8ThrowDOMException::CreateOrDie(
           resolver->GetScriptState()->GetIsolate(),
           DOMExceptionCode::kSecurityError, kFeaturePolicyBlocked));

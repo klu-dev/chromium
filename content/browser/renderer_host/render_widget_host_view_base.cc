@@ -403,6 +403,12 @@ RenderWidgetHostViewBase::GetKeyboardLayoutMap() {
   return base::flat_map<std::string, std::string>();
 }
 
+ui::DomKeyboardLayoutName
+RenderWidgetHostViewBase::GetKeyboardLayoutIdentifier() {
+  NOTIMPLEMENTED_LOG_ONCE();
+  return {};
+}
+
 blink::mojom::InputEventResultState RenderWidgetHostViewBase::FilterInputEvent(
     const blink::WebInputEvent& input_event) {
   // By default, input events are simply forwarded to the renderer.

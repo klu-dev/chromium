@@ -361,6 +361,7 @@ static_idl_files_in_modules = get_path_info(
           "//third_party/blink/renderer/modules/indexeddb/worker_global_scope_indexed_database.idl",
           "//third_party/blink/renderer/modules/installedapp/navigator_installed_app.idl",
           "//third_party/blink/renderer/modules/installedapp/related_application.idl",
+          "//third_party/blink/renderer/modules/keyboard/keyboard_layout_name.idl",
           "//third_party/blink/renderer/modules/keyboard/keyboard.idl",
           "//third_party/blink/renderer/modules/keyboard/keyboard_layout_map.idl",
           "//third_party/blink/renderer/modules/keyboard/navigator_keyboard.idl",

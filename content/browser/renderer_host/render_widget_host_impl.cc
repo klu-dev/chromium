@@ -3062,6 +3062,13 @@ RenderWidgetHostImpl::GetKeyboardLayoutMap() {
   return view_->GetKeyboardLayoutMap();
 }
 
+ui::DomKeyboardLayoutName
+RenderWidgetHostImpl::GetKeyboardLayoutIdentifier() {
+  if (!view_)
+    return {};
+  return view_->GetKeyboardLayoutIdentifier();
+}
+
 void RenderWidgetHostImpl::RequestForceRedraw(int snapshot_id) {
   if (!blink_widget_)
     return;

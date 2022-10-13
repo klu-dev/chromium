@@ -1235,6 +1235,14 @@ RenderWidgetHostViewAura::GetKeyboardLayoutMap() {
   return {};
 }
 
+ui::DomKeyboardLayoutName
+RenderWidgetHostViewAura::GetKeyboardLayoutIdentifier() {
+  aura::WindowTreeHost* host = window_->GetHost();
+  if (host)
+    return host->GetKeyboardLayoutIdentifier();
+  return {};
+ }
+
 ////////////////////////////////////////////////////////////////////////////////
 // RenderWidgetHostViewAura, ui::TextInputClient implementation:
 void RenderWidgetHostViewAura::SetCompositionText(

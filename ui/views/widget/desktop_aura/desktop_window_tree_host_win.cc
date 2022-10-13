@@ -39,6 +39,7 @@
 #include "ui/events/keyboard_hook.h"
 #include "ui/events/keycodes/dom/dom_code.h"
 #include "ui/events/keycodes/dom/dom_keyboard_layout_map.h"
+#include "ui/events/keycodes/dom/dom_keyboard_layout_name.h"
 #include "ui/events/platform/platform_event_source.h"
 #include "ui/gfx/geometry/insets.h"
 #include "ui/gfx/geometry/vector2d.h"
@@ -731,6 +732,11 @@ bool DesktopWindowTreeHostWin::IsKeyLocked(ui::DomCode dom_code) {
 base::flat_map<std::string, std::string>
 DesktopWindowTreeHostWin::GetKeyboardLayoutMap() {
   return ui::GenerateDomKeyboardLayoutMap();
+}
+
+ui::DomKeyboardLayoutName
+DesktopWindowTreeHostWin::GetKeyboardLayoutIdentifier() {
+  return ui::GetDomKeyboardLayoutName();
 }
 
 void DesktopWindowTreeHostWin::SetCursorNative(gfx::NativeCursor cursor) {

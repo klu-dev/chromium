@@ -26,6 +26,7 @@
 
 using blink::mojom::GetKeyboardLayoutMapResult;
 using blink::mojom::KeyboardLockRequestResult;
+using blink::mojom::GetKeyboardLayoutNameResult;
 
 namespace content {
 
@@ -141,6 +142,28 @@ void KeyboardLockServiceImpl::GetKeyboardLayoutMap(
   }
   response->status = blink::mojom::GetKeyboardLayoutMapStatus::kSuccess;
   response->layout_map = frame_host_impl.GetPage().GetKeyboardLayoutMap();
+
+  std::move(callback).Run(std::move(response));
+}
+
+void KeyboardLockServiceImpl::GetKeyboardLayoutName(
+    GetKeyboardLayoutNameCallback callback) {
+  auto& frame_host_impl =
+      static_cast<RenderFrameHostImpl&>(render_frame_host());
+
+  auto response = GetKeyboardLayoutNameResult::New();
+  // TODO: use keyboard layout name policy
+  // The keyboard layout map is only accessible from the outermost main frame or
+  // with the permission policy enabled.
+  if (frame_host_impl.GetParentOrOuterDocument() &&
+      !frame_host_impl.IsFeatureEnabled(
+          blink::mojom::PermissionsPolicyFeature::kKeyboardMap)) {
+    response->status = blink::mojom::GetKeyboardLayoutNameStatus::kDenied;
+    std::move(callback).Run(std::move(response));
+    return;
+  }
+  response->status = blink::mojom::GetKeyboardLayoutNameStatus::kSuccess;
+  response->layout_name = frame_host_impl.GetPage().GetKeyboardLayoutIdentifier();
 
   std::move(callback).Run(std::move(response));
 }

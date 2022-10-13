@@ -289,4 +289,8 @@ base::flat_map<std::string, std::string> PageImpl::GetKeyboardLayoutMap() {
   return GetMainDocument().GetRenderWidgetHost()->GetKeyboardLayoutMap();
 }
 
+ui::DomKeyboardLayoutName PageImpl::GetKeyboardLayoutIdentifier() {
+  return GetMainDocument().GetRenderWidgetHost()->GetKeyboardLayoutIdentifier();
+}
+
 }  // namespace content

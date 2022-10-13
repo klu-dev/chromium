@@ -164,6 +164,12 @@ WindowTreeHostPlatform::GetKeyboardLayoutMap() {
 #endif
 }
 
+ui::DomKeyboardLayoutName
+WindowTreeHostPlatform::GetKeyboardLayoutIdentifier() {
+  NOTIMPLEMENTED();
+  return {};
+}
+
 void WindowTreeHostPlatform::SetCursorNative(gfx::NativeCursor cursor) {
   if (cursor == current_cursor_)
     return;

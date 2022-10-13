@@ -22,4 +22,11 @@
      HighEntropy,
      MeasureAs=KeyboardApiGetLayoutMap
     ] Promise<KeyboardLayoutMap> getLayoutMap();
+
+    // TODO: Add keyboard layout name spec reference
+    [CallWith=ScriptState,
+     RaisesException,
+     HighEntropy,
+     MeasureAs=KeyboardApiGetLayoutName
+    ] Promise<KeyboardLayoutName> getLayoutName();
 };

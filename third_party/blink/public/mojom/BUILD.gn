@@ -577,6 +577,16 @@ mojom("mojom_platform") {
     {
       types = [
         {
+          mojom = "blink.mojom.KeyboardLayoutName"
+          cpp = "::ui::DomKeyboardLayoutName"
+        },
+      ]
+      traits_headers =["//ui/events/mojom/keyboard_blink_mojom_traits.h"]
+      traits_public_deps =["//ui/events:dom_keyboard_layout"]
+    },
+    {
+      types =[
+        {
           mojom = "blink.mojom.CredentialType"
           cpp = "::password_manager::CredentialType"
         },

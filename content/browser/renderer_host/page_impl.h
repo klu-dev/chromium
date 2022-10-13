@@ -24,6 +24,7 @@
 #include "third_party/blink/public/mojom/frame/text_autosizer_page_info.mojom.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "ui/base/ime/mojom/virtual_keyboard_types.mojom.h"
+#include "ui/events/keycodes/dom/dom_keyboard_layout_name.h"
 #include "url/gurl.h"
 
 namespace content {
@@ -171,6 +172,9 @@ class CONTENT_EXPORT PageImpl : public Page {
 
   // Returns the keyboard layout mapping.
   base::flat_map<std::string, std::string> GetKeyboardLayoutMap();
+
+  // Returns the keyboard layout name.
+  ui::DomKeyboardLayoutName GetKeyboardLayoutIdentifier();
 
  private:
   void DidActivateAllRenderViewsForPrerendering();

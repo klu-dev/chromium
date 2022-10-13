@@ -565,6 +565,8 @@ generated_dictionary_sources_in_modules = [
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_json_web_key.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_key_system_track_configuration.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_key_system_track_configuration.h",
+  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_keyboard_layout_name.cc",
+  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_keyboard_layout_name.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_landmark.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_landmark.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_lock_info.cc",

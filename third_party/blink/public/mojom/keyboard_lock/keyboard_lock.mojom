@@ -25,6 +25,24 @@ struct GetKeyboardLayoutMapResult {
   map<string, string> layout_map;
 };
 
+enum GetKeyboardLayoutNameStatus {
+  kSuccess = 0,
+  kFail = 1,
+  kDenied = 2,
+};
+
+struct KeyboardLayoutName {
+  string locale;
+  string layout;
+};
+
+struct GetKeyboardLayoutNameResult {
+  GetKeyboardLayoutNameStatus status;
+
+  // Keyboard layout identifier
+  KeyboardLayoutName layout_name;
+};
+
 // The browser side service to process navigator.keyboard.lock() and
 // navigator.keyboard.unlock() web APIs. See http://crbug.com/680809.
 interface KeyboardLockService {
@@ -41,4 +59,8 @@ interface KeyboardLockService {
   // Requests the keyboard layout mapping for the highest-priority ASCII-capable
   // installed layout.
   GetKeyboardLayoutMap() => (GetKeyboardLayoutMapResult result);
+
+  // Requests the keyboard layout name for the highest-priority ASCII-capable
+  // installed layout.
+  GetKeyboardLayoutName() => (GetKeyboardLayoutNameResult result);
 };

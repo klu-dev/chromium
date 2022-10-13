@@ -30,6 +30,7 @@ class KeyboardLockServiceImpl final
                            RequestKeyboardLockCallback callback) override;
   void CancelKeyboardLock() override;
   void GetKeyboardLayoutMap(GetKeyboardLayoutMapCallback callback) override;
+  void GetKeyboardLayoutName(GetKeyboardLayoutNameCallback callback) override;
 
  private:
   KeyboardLockServiceImpl(

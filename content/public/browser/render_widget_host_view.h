@@ -17,6 +17,7 @@
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "ui/base/ime/mojom/virtual_keyboard_types.mojom-forward.h"
+#include "ui/events/keycodes/dom/dom_keyboard_layout_name.h"
 #include "ui/display/screen_infos.h"
 #include "ui/gfx/geometry/point_conversions.h"
 #include "ui/gfx/native_widget_types.h"
@@ -194,6 +195,8 @@ class CONTENT_EXPORT RenderWidgetHostView {
   // highest-priority ASCII-capable layout in the list of currently installed
   // keyboard layouts.
   virtual base::flat_map<std::string, std::string> GetKeyboardLayoutMap() = 0;
+
+  virtual ui::DomKeyboardLayoutName GetKeyboardLayoutIdentifier() = 0;
 
   // Retrives the size of the viewport for the visible region. May be smaller
   // than the view size if a portion of the view is obstructed (e.g. by a

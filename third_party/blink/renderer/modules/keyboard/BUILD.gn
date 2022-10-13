@@ -6,6 +6,8 @@ import("//third_party/blink/renderer/modules/modules.gni")
 
 blink_modules_sources("keyboard") {
   sources = [
+    "keyboard_type_converters.cc",
+    "keyboard_type_converters.h",
     "keyboard.cc",
     "keyboard.h",
     "keyboard_layout.cc",
@@ -16,5 +18,6 @@ blink_modules_sources("keyboard") {
     "keyboard_lock.h",
     "navigator_keyboard.cc",
     "navigator_keyboard.h",
+
   ]
 }

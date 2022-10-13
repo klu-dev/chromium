@@ -27,6 +27,7 @@
 #include "ui/display/display_observer.h"
 #include "ui/events/event_source.h"
 #include "ui/events/platform_event.h"
+#include "ui/events/keycodes/dom/dom_keyboard_layout_name.h"
 #include "ui/gfx/native_widget_types.h"
 #include "ui/gfx/overlay_transform.h"
 
@@ -254,6 +255,7 @@ class AURA_EXPORT WindowTreeHost : public ui::ImeKeyEventDispatcher,
 
   // Returns a map of KeyboardEvent code to KeyboardEvent key values.
   virtual base::flat_map<std::string, std::string> GetKeyboardLayoutMap() = 0;
+  virtual ui::DomKeyboardLayoutName GetKeyboardLayoutIdentifier() = 0;
 
   // Returns true if KeyEvents should be send to IME. This is called from
   // WindowEventDispatcher during event dispatch.

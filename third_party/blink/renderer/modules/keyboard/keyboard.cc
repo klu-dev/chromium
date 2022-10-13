@@ -33,6 +33,11 @@ ScriptPromise Keyboard::getLayoutMap(ScriptState* state,
   return keyboard_layout_->GetKeyboardLayoutMap(state, exception_state);
 }
 
+ScriptPromise Keyboard::getLayoutName(ScriptState* state,
+                                     ExceptionState& exception_state) {
+  return keyboard_layout_->GetKeyboardLayoutName(state, exception_state);
+}
+
 void Keyboard::Trace(Visitor* visitor) const {
   visitor->Trace(keyboard_lock_);
   visitor->Trace(keyboard_layout_);

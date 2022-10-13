@@ -12,9 +12,11 @@
 #include "base/check_op.h"
 #include "base/containers/flat_map.h"
 #include "base/logging.h"
+#include "base/strings/utf_string_conversions.h"
 #include "ui/events/keycodes/dom/dom_code.h"
 #include "ui/events/keycodes/dom/dom_key.h"
 #include "ui/events/keycodes/dom/dom_keyboard_layout_map_base.h"
+#include "ui/events/keycodes/dom/dom_keyboard_layout_name.h"
 #include "ui/events/keycodes/dom/keycode_converter.h"
 
 namespace ui {
@@ -153,6 +155,65 @@ ui::DomKey DomKeyboardLayoutMapWin::GetDomKeyFromDomCodeForLayout(
 // static
 base::flat_map<std::string, std::string> GenerateDomKeyboardLayoutMap() {
   return DomKeyboardLayoutMapWin().Generate();
+}
+
+// static
+bool IsCjkLanguage(uint32_t locale) {
+  LANGID langId = PRIMARYLANGID(locale & 0xFFFFU);
+  return ((langId == LANG_JAPANESE) || (langId == LANG_KOREAN) ||
+          (langId == LANG_CHINESE));
+}
+
+std::string LocaleCodeToString(uint32_t locale) {
+  wchar_t wchar_buffer[LOCALE_NAME_MAX_LENGTH] = {0};
+
+  // The length include the terminating null character.
+  int32_t len =
+      LCIDToLocaleName(locale & 0xFFFFUL, wchar_buffer, LOCALE_NAME_MAX_LENGTH,
+                       LOCALE_ALLOW_NEUTRAL_NAMES);
+  if (!len) {
+    if (GetLastError() != 0)
+      DPLOG(ERROR) << "LCIDToLocaleName failed: ";
+    return std::string();
+  }
+
+  std::string utf8_value;
+  if (!base::WideToUTF8(wchar_buffer, len - 1, &utf8_value))
+    return std::string();
+  return utf8_value;
+}
+
+std::string LayoutCodeToString(uint32_t layout) {
+  char char_buffer[LOCALE_NAME_MAX_LENGTH] = {0};
+
+  auto len = sprintf_s(char_buffer, LOCALE_NAME_MAX_LENGTH, "%08X", layout);
+  if (0 < len) {
+    return char_buffer;
+  }
+
+  return std::string();
+}
+
+// static
+ui::DomKeyboardLayoutName GetDomKeyboardLayoutName() {
+  HKL hkl = ::GetKeyboardLayout(0);
+  uint32_t locale = uint32_t(ULONG_PTR(hkl)) & 0xFFFFUL;
+  uint32_t layout = uint32_t(ULONG_PTR(hkl)) >> 16;
+
+  // For CJK (Chinese, Japanese, Korean) languages, it's IME.
+  // Use 0xe001xxxx represent IME in Windows.
+  // TODO: Use IME profile file format {clasid}{guidprofile} to specific IMe
+  if (IsCjkLanguage(locale)) {
+    layout = locale | 0xE0010000;
+  } else {
+    wchar_t szName[KL_NAMELENGTH] = {0};
+    if (FALSE == ::GetKeyboardLayoutNameW(szName)) {
+      if (GetLastError() != 0)
+        DPLOG(ERROR) << "GetKeyboardLayoutNameW failed: ";
+    }
+  }
+
+  return {LocaleCodeToString(locale), LayoutCodeToString(layout)};
 }
 
 }  // namespace ui
